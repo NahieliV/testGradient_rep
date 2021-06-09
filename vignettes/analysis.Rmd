@@ -1,0 +1,604 @@
+---
+title: "Analysis of survey experiment"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = '/Users/nahieli/Documents/Test/2021-05-26-Homework-Assignment')
+
+#output: rmarkdown::html_vignette
+```
+
+This vignette shows the analysis done on a survey experiment. The goal of the experiment is to define the best combination of attributes.
+
+First of all, we load all the libraries we need
+
+```{r, message=FALSE}
+
+#options(scipen=999)
+
+library(haven)
+library(labelled)
+library(DT)
+library(cowplot)
+library(grid)
+library(gridExtra)
+library(scales)
+
+
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(purrr)
+library(tibble)
+library(tidyr)
+```
+
+Then we install our own library
+
+```{r}
+
+library(miLibreria2)
+```
+
+## Exploratory data analysis
+
+We have been provided with two data sets:
+
+-   the survey data
+
+-   the experiment data
+
+We will perform an EDA on each one of the datasets.
+
+### Survey data
+
+We can begin by a quick glimpse at the survey data.
+
+```{r message=TRUE, warning=TRUE}
+
+survey <- data.frame(survey)
+
+DT::datatable(survey[,1:5])
+
+```
+
+We observe that we have 892 entries and 100 variables, composed of mainly demographic data.
+
+```{r}
+
+dim(survey)
+```
+
+We will make some graphs to get a sense of the distribution of some of the main demographic variables.
+
+#### Place of residence
+
+Almost half of respondents live in a suburban setting. Followed by an urban setting for more than a third of them, and then in a rural setting for around 1 in 6 respondents.
+
+```{r}
+
+get_bar_chart_labels(data = survey, variable = d_urban, title = "Place of residence")
+```
+
+#### Gender
+
+As expected, women are make up a bit over half of our respondents.
+
+```{r}
+
+
+get_bar_chart_labels(data = survey, variable = s_gender, title = "Gender of the respondents")
+
+
+```
+
+#### Education
+
+We can break down our respondents by education.
+
+```{r}
+
+
+get_bar_chart_labels(data = survey, variable = d_education, title = "Education of the respondents")
+
+```
+
+For simplifying our analysis and avoid having too many levels, we will recode this variable into just three levels :
+
+-   less than college
+
+-   at least some college or currently enrolled
+
+-   at least some postgraduate education or courses
+
+```{r}
+
+education_labels = c("Less than collegue" = 1, "At least some college" = 2, "More than college" = 3 )
+
+survey <- survey %>%
+    mutate(d_education_collapse = labelled (case_when(d_education <= 2 ~ 1,
+                                                    d_education > 2 & d_education <7  ~ 2,
+                                                    d_education >= 7 ~ 3),
+                                                    education_labels)) 
+
+```
+
+And we get a clearer picture of the distribution of education levels among our respondents. Almost 1 in 4 of our respondents have "Less than college" , more than half have "At least some college", and 1 in 5 have "More than college".
+
+```{r}
+get_bar_chart_labels(data = survey, variable = d_education_collapse, title = "Education of the respondents")
+
+```
+
+#### Race of the respondents
+
+Whites make around 60% of our sample, Hipanic and Latino represent around 1 in 6, our respondents, and African Americans represent around 1 in 8.
+
+```{r}
+
+get_bar_chart_labels(data = survey, variable = s_race, title = "Race of the respondents")
+
+
+```
+
+#### Income
+
+Around one in 4 of respondents earn "Less than 25,000", one in 4 earn between "\$25,000 and \$50,000", around 30% earn between "\$0,000 and \$100,000" and around one u-in five earn "\$100,000 or more".
+
+```{r}
+
+get_bar_chart_labels(data = survey, variable = s_hhincome, title = "Income of the respondents")
+
+
+```
+
+### Experiment data
+
+We will now turn our attention to the experiment data to have a glimpse of the experiment and the outcomes. The experiment consisted in showing to each respondent 12 different permutations of a message intended to make them download the app in order to determine with which permutation the respondent are most likely to download the app.
+
+So we begin by getting the experiment data, and joining it with the survey data.
+
+```{r}
+
+experiment <- data.frame(experiment)
+
+
+experiment_aug <- left_join(experiment, survey, by = "response_id")
+
+```
+
+```{r}
+
+DT::datatable(experiment_aug[,1:5])
+
+```
+
+The permutations were done on the following variables:
+
+-   offer (5 possibilities)
+
+-   outcome (3 possibilities)
+
+-   rtb (6 possibilities)
+
+-   social proof (3 possibilities)
+
+-   price (3 possibilities)
+
+-   duration (3 options)
+
+```{r}
+
+experiment_aug %>% select(duration:social_proof) %>% purrr::map(unique)
+```
+
+As every respondent was shown 12 different permutations, we have in total 10, 700 observations in the experiment dataset.
+
+```{r}
+
+dim(experiment_aug)
+
+```
+
+We will begin by having a look at the distribution of answers. First, we will add labels to our dataset. We know that the corresponding labels are the following :
+
+-   1: Very unlikely
+
+-   2: Somewhat unlikely
+
+-   3: Somewhat likely
+
+-   4 : Very likely
+
+```{r}
+
+answer_labels = c("Very unlikely" = 1, "Somewhat unlikely" = 2, 
+                  "Somewhat likely" = 3, "Very likely" = 4)
+
+experiment_aug <- experiment_aug %>%
+    mutate(answer = labelled(answer, answer_labels))
+
+
+```
+
+Once we have added our labels, we will observe the distribution of answers. We can see that the answers are not evenly distributed. The sum of the relative frequencies of the answers "Somewhat unlikely" and of "Somewhat likely" are around the same as the relative frequency of the "Very unlikely" alone.
+
+```{r}
+
+
+get_bar_chart_labels(data = experiment_aug, variable = answer, title = "Answer of the respondents")
+
+
+```
+
+We will also want to see if the different levels of each categorical variable are more or less balanced in the data set. As we can see, the different levels of the categorical variables of the experiment are relatively well balanced. We do not observe for any variable that one level has a substantially higher share than the others.
+
+```{r}
+
+experiment_graphs = c("duration", "offer", "outcome", "price", "rtb" )
+
+list_graphs = map(.x = experiment_graphs, ~get_simple_bar_simple(data = experiment_aug, variable = .x))
+
+```
+
+```{r}
+
+plots <-plot_grid(list_graphs[[1]], list_graphs[[2]], list_graphs[[3]], list_graphs[[4]]       ,list_graphs[[5]],
+          labels = experiment_graphs, 
+          label_size = 12,
+          ncol = 1,
+          nrow = 5,
+          align = "hv",
+          label_y = 1)
+
+```
+
+```{r fig.height= 9}
+
+grid.arrange(plots, 
+             bottom = textGrob("Relative frequency", gp = gpar(fontsize = 14, fontface="bold")))
+```
+
+#### Effect of demographic variables
+
+We will look at the effect of the main demographic variables on the likelihood to say they would download the app.
+
+```{r}
+
+DT::datatable(get_index(data = experiment_aug, grouping_var = d_urban, index_var = answer))
+```
+
+We will better visualize this in a bar graph. We can see that rural and suburban residents tend to have the same distribution among the Answer variable. However, urban residents exhibit a distribution that is eschewed in exactly the opposite direction. Rural and suburban residents are more more unlikely than the general population to say they would download the app, whereas urban resident are more likely to say they would do it.
+
+```{r}
+
+get_index(data = experiment_aug, grouping_var = d_urban, index_var = answer) %>%
+  get_bar_plot_index(grouping_var = d_urban, title = "Answer index by place of residence")
+
+```
+
+We turn now on the distribution of answers by gender. We can observe clear differences in gender, with men being more likely than women to say they would download the app.
+
+```{r}
+
+get_index(data = experiment_aug, grouping_var = s_gender, index_var = answer) %>%
+  get_bar_plot_index(grouping_var = s_gender, title = "Answer index by gender")
+```
+
+Then we obtain the distribution of answers by education. Respondents with "More than college" tend to be more much likely than the general population to say they would download the app.
+
+```{r}
+
+get_index(data = experiment_aug, grouping_var = d_education_collapse, index_var = answer) %>%
+  get_bar_plot_index(grouping_var = d_education_collapse, title = "Answer index by education")
+
+```
+
+By looking at the grouped distribution by income levels, we can say that those who earn more than \$100,00 per year or more are less likely to say they would download the app.
+
+```{r}
+
+get_index(data = experiment_aug, grouping_var = s_hhincome, index_var = answer) %>%
+  get_bar_plot_index(grouping_var = s_hhincome, title = "Answer index by education")
+```
+
+We turn to the distribution of answers by race. We can observe that African Americans are much more likely than the general population to say they would be "Very likely" to download the app, while white people are more likely than the general population to say they would be "Very unlikely" to download the app.
+
+```{r}
+
+get_index(data = experiment_aug, grouping_var = s_race, index_var = answer) %>%
+  get_bar_plot_index(grouping_var = s_race, title = "Answer index by race")
+```
+
+We will now turn to our attention to see if the distribution of answers differs between levels of the question *How often would you say you have trouble sleeping at night during a typical week?.* Unsurprisingly, those who say they have trouble sleeping every night are much more likely than the general population to say they would likely download the app.
+
+```{r}
+
+
+get_index(data = experiment_aug, grouping_var = s_problem, index_var = answer) %>%
+  get_bar_plot_index(grouping_var = s_problem, title = "Answer index by frequency of trouble slepping")
+
+```
+
+#### Effect of experiment variables
+
+We will explore the effect of the experiment's variables on the distribution of the likelihood to download the app.
+
+##### Duration
+
+There seems to be no notable differences on the distribution of the likelihood to download the app by the different of the `duration` variable.
+
+```{r}
+
+get_index(data = experiment_aug, grouping_var = duration, index_var = answer) %>%
+  get_bar_plot_index(grouping_var = duration, title = "Answer index by duration")
+
+```
+
+##### Offer
+
+There are no significant differences in distribution of the likelihood of downloading the app by the offer phase.
+
+```{r}
+
+get_index(data = experiment_aug, grouping_var = offer, index_var = answer) %>%
+  get_bar_plot_index(grouping_var = offer, title = "Answer index by offer")
+
+```
+
+##### Outcome
+
+The phase"breaking bad habits and creating new routines" seems to be the best performing one.
+
+```{r}
+
+get_index(data = experiment_aug, grouping_var = outcome, index_var = answer) %>%
+  get_bar_plot_index(grouping_var = outcome, title = "Answer index by offer")
+
+```
+
+##### Price
+
+```{r}
+
+get_index(data = experiment_aug, grouping_var = price, index_var = answer) %>%
+  get_bar_plot_index(grouping_var = price, title = "Answer index by offer")
+
+```
+
+##### rtb
+
+We observe a clear difference in the distribution of the answer variable according to the `rtb` phrase that was chosen. The phrase that appear to be more personalized, like "personalized, human coaching" and "a program created just for you" seem to make people more likely to download the app.
+
+```{r}
+
+get_index(data = experiment_aug, grouping_var = rtb, index_var = answer) %>%
+  get_bar_plot_index(grouping_var = rtb, title = "Answer index by offer")
+
+```
+
+##### Social proof
+
+The best performing phrase appears to be "scientific evidence".
+
+```{r}
+
+get_index(data = experiment_aug, grouping_var = social_proof, index_var = answer) %>%
+  get_bar_plot_index(grouping_var = social_proof, title = "Answer index by offer")
+
+```
+
+## Data preparation for modeling
+
+Before starting the modeling, we need to prepare our data.
+
+-   All the variables that contain `m2_awareness_apps` signal if the user has already used a particular app. This should be a 0 or 1 dummy variable. So we will assign 0 whenever we have a `NA` value.
+
+-   All the variables that contain `source` ask people if a particular thing is one the causes for which they do not sleep well. So if there is `NA`, we assign 0.
+
+-   All the variables that contain `behavior_x` where `x` is a number ask people if they have engaged in a particular behavior in order to increase their sleep quality. So if there is `NA`, we assign 0.
+
+-   We will also create two variables:
+
+    -   `m2_awareness_apps` number of all the apps the respondent has used
+
+    -   `behavior` number of all the behaviors in which the respondent has engaged
+
+```{r}
+
+train <- experiment_aug %>%
+  mutate(across(contains("m2_awareness_apps_"), ~if_else(is.na(.x), 0, 1)),
+         across(contains("source_"), ~if_else(is.na(.x), 0, 1)),
+         across(matches("behavior_\\d"), ~if_else(is.na(.x), 0, 1))) %>%
+  mutate(m2_awareness_apps = rowSums(across(contains("m2_awareness_apps_"))),
+         behavior = rowSums(across(matches("behavior_\\d"))))
+      
+
+```
+
+For simplifying this first analysis, we keep only the variable that have no missing values after the quick data preparation we described above.
+
+```{r}
+
+columns_keep <- train %>% map(~sum(is.na(.))) %>% keep(.==0) %>% names()
+
+train <- train[columns_keep]
+```
+
+We get a vector of variables (or features), and then separate our into the independent variable data set, and the target (or independent variable) data set.
+
+```{r}
+
+non_feature_vectors <- c("response_id", "task","answer", "weights")
+feature_vectors <- setdiff(columns_keep, non_feature_vectors)
+
+features_data <- train[feature_vectors]
+target <- train["answer"]
+
+```
+
+```{r}
+
+#chisq.test(train$answer, train$duration, correct=FALSE)
+```
+
+## Modeling
+
+### Chi-square test
+
+We will perform a chi-square test on each variable. The purpose of doing a chi-square test is to determine if there is a significant difference between the expected and the observed frequencies in a dataset between different categories.
+
+```{r, warning=FALSE}
+
+list_chi_square <- map(features_data, possibly(function(x) {
+  chisq.test(target, x, correct = FALSE)}
+  , NA_real_ ))
+
+```
+
+And then we recuperate the output of the tests
+
+```{r, warning=FALSE}
+
+chi_statistic <- map(list_chi_square, "statistic") %>% tibble::enframe() %>% unnest()
+chi_p_values <- map(list_chi_square, "p.value") %>% tibble::enframe() %>% unnest()
+
+chi_results <- tibble(feature = chi_statistic$name,
+                      statistic = chi_statistic$value,
+                      p_value = chi_p_values$value) %>%
+                mutate(across(where(is.double), ~scientific(., digits = 3))) 
+```
+
+From a first glance at the data, it would appear that the only variable that is not independent from the answer are only two:
+
+-   `duration`
+
+-   `offer`
+
+```{r}
+
+
+DT::datatable(chi_results)
+
+```
+
+Both of these variable are part of the experiment's variables. However, we must keep in mind that a chi-square test is done exclusively between two variables, and, in this specific case, it would not allow us to detect relationships between independent variables. For example, if the `duration` variable really has a statistically significant effect on the likelihood to download the app but only after controlling for demographic variables, the chi-square test would not allow us to detect it.
+
+### Ordinal logistic regression
+
+We will perform an ordinal logistic regression. An ordinal logistic regression serves to predict a dependent categorical variable where classes are ordered. In this case, we say that our classes are ordered because we can establish an order between the answers, which are:
+
+```{r}
+print(answer_labels)
+
+```
+
+We can consider the four possible responses as different degrees of likelihood to download the app. In common language terms, we could say, that:
+
+-   "Somewhat unlikely" \< "Somewhat likely" \< "Very likely"
+
+We prepare our data to be fed to the model, namely by ordering the `answer` variable and by casting as factors the categorical variables. For the variables related to the beliefs of the individual, the `m1_philosophy_*` we will do an ordinal approximation and treat them as continuous.
+
+```{r}
+
+train_logit <- train %>%
+mutate(answer = unlabelled(answer), 
+       answer = factor(answer, 
+                       levels = c("Very unlikely", "Somewhat unlikely", "Somewhat likely", "Very likely"), ordered=TRUE)) %>%
+mutate(across(where(is_character), as.factor),
+       across(past_coach:d_employment, unlabelled),
+       across(d_urban:s_problem, unlabelled)) 
+
+                
+```
+
+We run our model
+
+```{r, warning=FALSE}
+
+model <- MASS::polr(formula = answer ~ duration + offer + outcome + price + rtb +    social_proof + s_gender +  m2_awareness_apps + behavior + past_coach + interest_coach + d_parent + d_employment + s_gender + s_race + s_problem + m1_philosophy_2 + m1_philosophy_5 + m1_philosophy_6 + m1_philosophy_8 + s_problem, data = train_logit, Hess = TRUE, weights = weights, method = "logistic" )
+
+
+```
+
+And print its output
+
+```{r}
+
+
+print(model)
+```
+
+We get the variable coefficients and p-values.
+
+```{r}
+
+model_summary <- coef(summary(model))
+
+pval <- pnorm(abs(model_summary[, "t value"]),lower.tail = FALSE)* 2
+model_summary <- as.data.frame(cbind(model_summary, "p value" = round(pval,3)))
+
+```
+
+We format our model output in a data frame.
+
+```{r}
+
+
+model_summary_df <- rownames_to_column(model_summary, var = "variable") %>%
+  mutate(across(where(is.double), ~scientific(., digits = 3)))
+  
+
+```
+
+```{r}
+
+DT::datatable(model_summary_df)
+
+```
+
+In an ordinal logistic regression, we can interpret the coefficients in the following way:
+
+-   for categorical variables like `s_gender`, the coefficient tells us that being a Female, as compared to being a Male, is associated with a lower likelihood of downloading the app because the coefficient has a negative sign.
+
+-   for continuous variables like `m2_awareness_apps` the coefficient can be interpreted as: if the `m2_awareness_apps` variable increases in one unit, the log odds of downloading the app increase by 0.19.
+
+From the coefficients and p-values of the regression, we can make the following interpretations:
+
+-   Some variables of our experiment have little or no influence at all in the likelihood to download the app. The categorical variable `duration` does not appear to have a statistically significant effect.
+
+-   Likewise, the `offer` variable does not seem to be significant either.
+
+-   The `outcome` variable does not appear to be significant either
+
+-   The `price` variable appears to have a significant effect on the likelihood to download the app. The higher the price, the less the likelihood to download it.
+
+-   The `rtb` variable does not appear to be significant either.
+
+-   The `social_proof` variable does not appear to be significant either. However, we might say that the phrases "leading researches" and "scientific evidence" seem to be the best options.
+
+-   Unsurprisingly, by looking at the variable `s_problem` we see that people who have trouble sleeping every night are more likely to download the app.
+
+-   People who have already used other apps are more likely to download the app, as the `m2_awareness_apps` coefficient indicates.
+
+-   Some variables related to the beliefs to the respondents, like the fact have a significant effect on the likelihood to download the app.
+
+-   A stronger interest in working with a professional coach is associated with a higher likelihood to download the app.
+
+Based on the above, we can say that:
+
+-   Out of the six variables of the experiment, only for one variable we have strong statistical evidence of an association with the likelihood to download the app: `price`. The higher the price,
+
+-   The variables `duration` and `offer` show no statistical significant effect on the likelihood to download based on both the ordinal logistic regression and the chi-square test.
+
+-   Even though the statistical evidence is not very strong, we might say that for the `social_proof` variable, the answers that signal science-backed results ("leading researches" and "scientific evidence" ) seem to perform better.
