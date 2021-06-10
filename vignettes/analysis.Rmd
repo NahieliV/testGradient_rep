@@ -632,7 +632,7 @@ Based on the above, we can say that:
 
 -   Even though the statistical evidence is not very strong, we might say that for the `social_proof` variable, the answers that signal science-backed results ("leading researches" and "scientific evidence" ) seem to perform better.
 
-I would the client wants to boost the number of users that download the app, I would then recommend to:
+I would tell the client that, in order to improve the download rate, I would recommend to:
 
 -   set the price at \$20/month
 
