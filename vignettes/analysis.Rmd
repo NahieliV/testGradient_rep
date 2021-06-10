@@ -22,7 +22,6 @@ First of all, we load all the libraries we need
 
 ```{r, message=FALSE}
 
-#options(scipen=999)
 
 library(haven)
 library(labelled)
@@ -32,13 +31,6 @@ library(grid)
 library(gridExtra)
 library(scales)
 
-
-library(dplyr)
-library(ggplot2)
-library(stringr)
-library(purrr)
-library(tibble)
-library(tidyr)
 ```
 
 Then we install our own library

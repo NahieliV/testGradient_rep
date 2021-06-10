@@ -24,7 +24,8 @@ Imports:
 	tidyverse,
 	labelled,
 	DT,
-	cowplot,
+  	cowplot,
 	grid,
 	gridExtra,
 	scales,
+	patchwork	
