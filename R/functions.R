@@ -106,7 +106,7 @@ get_bar_simple <- function(data, variable) {
 #get_index()
 
 
-get_bar_plot_index <- function(data, grouping_var, title = "Plot_title") {
+get_bar_chart_index <- function(data, grouping_var, title = "Plot_title") {
   
   
   levels_ans = c("Very likely", "Somewhat likely", "Somewhat unlikely", "Very unlikely")

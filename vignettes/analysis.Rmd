@@ -247,7 +247,7 @@ We will also want to see if the different levels of each categorical variable ar
 
 experiment_graphs = c("duration", "offer", "outcome", "price", "rtb" )
 
-list_graphs = map(.x = experiment_graphs, ~get_simple_bar_simple(data = experiment_aug, variable = .x))
+list_graphs = map(.x = experiment_graphs, ~get_bar_simple(data = experiment_aug, variable = .x))
 
 ```
 
@@ -283,7 +283,7 @@ We will better visualize this in a bar graph. We can see that rural and suburban
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = d_urban, index_var = answer) %>%
-  get_bar_plot_index(grouping_var = d_urban, title = "Answer index by place of residence")
+  get_bar_chart_index(grouping_var = d_urban, title = "Answer index by place of residence")
 
 ```
 
@@ -292,7 +292,7 @@ We turn now on the distribution of answers by gender. We can observe clear diffe
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = s_gender, index_var = answer) %>%
-  get_bar_plot_index(grouping_var = s_gender, title = "Answer index by gender")
+  get_bar_chart_index(grouping_var = s_gender, title = "Answer index by gender")
 ```
 
 Then we obtain the distribution of answers by education. Respondents with "More than college" tend to be more much likely than the general population to say they would download the app.
@@ -300,7 +300,7 @@ Then we obtain the distribution of answers by education. Respondents with "More 
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = d_education_collapse, index_var = answer) %>%
-  get_bar_plot_index(grouping_var = d_education_collapse, title = "Answer index by education")
+  get_bar_chart_index(grouping_var = d_education_collapse, title = "Answer index by education")
 
 ```
 
@@ -309,7 +309,7 @@ By looking at the grouped distribution by income levels, we can say that those w
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = s_hhincome, index_var = answer) %>%
-  get_bar_plot_index(grouping_var = s_hhincome, title = "Answer index by education")
+  get_bar_chart_index(grouping_var = s_hhincome, title = "Answer index by education")
 ```
 
 We turn to the distribution of answers by race. We can observe that African Americans are much more likely than the general population to say they would be "Very likely" to download the app, while white people are more likely than the general population to say they would be "Very unlikely" to download the app.
@@ -317,7 +317,7 @@ We turn to the distribution of answers by race. We can observe that African Amer
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = s_race, index_var = answer) %>%
-  get_bar_plot_index(grouping_var = s_race, title = "Answer index by race")
+  get_bar_chart_index(grouping_var = s_race, title = "Answer index by race")
 ```
 
 We will now turn to our attention to see if the distribution of answers differs between levels of the question *How often would you say you have trouble sleeping at night during a typical week?.* Unsurprisingly, those who say they have trouble sleeping every night are much more likely than the general population to say they would likely download the app.
@@ -326,7 +326,7 @@ We will now turn to our attention to see if the distribution of answers differs 
 
 
 get_index(data = experiment_aug, grouping_var = s_problem, index_var = answer) %>%
-  get_bar_plot_index(grouping_var = s_problem, title = "Answer index by frequency of trouble slepping")
+  get_bar_chart_index(grouping_var = s_problem, title = "Answer index by frequency of trouble slepping")
 
 ```
 
@@ -341,7 +341,7 @@ There seems to be no notable differences on the distribution of the likelihood t
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = duration, index_var = answer) %>%
-  get_bar_plot_index(grouping_var = duration, title = "Answer index by duration")
+  get_bar_chart_index(grouping_var = duration, title = "Answer index by duration")
 
 ```
 
@@ -352,7 +352,7 @@ There are no significant differences in distribution of the likelihood of downlo
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = offer, index_var = answer) %>%
-  get_bar_plot_index(grouping_var = offer, title = "Answer index by offer")
+  get_bar_chart_index(grouping_var = offer, title = "Answer index by offer")
 
 ```
 
@@ -363,7 +363,7 @@ The phase"breaking bad habits and creating new routines" seems to be the best pe
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = outcome, index_var = answer) %>%
-  get_bar_plot_index(grouping_var = outcome, title = "Answer index by offer")
+  get_bar_chart_index(grouping_var = outcome, title = "Answer index by offer")
 
 ```
 
@@ -372,7 +372,7 @@ get_index(data = experiment_aug, grouping_var = outcome, index_var = answer) %>%
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = price, index_var = answer) %>%
-  get_bar_plot_index(grouping_var = price, title = "Answer index by offer")
+  get_bar_chart_index(grouping_var = price, title = "Answer index by offer")
 
 ```
 
@@ -383,7 +383,7 @@ We observe a clear difference in the distribution of the answer variable accordi
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = rtb, index_var = answer) %>%
-  get_bar_plot_index(grouping_var = rtb, title = "Answer index by offer")
+  get_bar_chart_index(grouping_var = rtb, title = "Answer index by offer")
 
 ```
 
@@ -394,7 +394,7 @@ The best performing phrase appears to be "scientific evidence".
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = social_proof, index_var = answer) %>%
-  get_bar_plot_index(grouping_var = social_proof, title = "Answer index by offer")
+  get_bar_chart_index(grouping_var = social_proof, title = "Answer index by offer")
 
 ```
 
