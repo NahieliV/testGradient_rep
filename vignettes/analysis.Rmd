@@ -13,12 +13,10 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = '/Users/nahieli/Documents/Test/2021-05-26-Homework-Assignment')
 
-#output: rmarkdown::html_vignette
 ```
 
-This vignette shows the analysis done on a survey experiment. The goal of the experiment is to define the best combination of attributes.
+This vignette shows the analysis done on a survey experiment. A survey experiment took place, where a random combination of phrases was shown to respondents, each respondent saw 12 different random permutations. Respondents were then asked `"How likely are you to download this mobile app?".` The app in question is referring to an app to help people sleep better.
 
 First of all, we load all the libraries we need
 
@@ -79,7 +77,13 @@ We observe that we have 892 entries and 100 variables, composed of mainly demogr
 dim(survey)
 ```
 
-We will make some graphs to get a sense of the distribution of some of the main demographic variables.
+We will set our plot dimensions.
+
+```{r include=FALSE}
+
+base_dimension <- patchwork::get_dim(get_bar_chart_labels(data = survey, variable = d_education, title = "Plot"))
+
+```
 
 #### Place of residence
 
@@ -87,7 +91,7 @@ Almost half of respondents live in a suburban setting. Followed by an urban sett
 
 ```{r}
 
-get_bar_chart_labels(data = survey, variable = d_urban, title = "Place of residence")
+get_bar_chart_labels(data = survey, variable = d_urban, title = "Place of residence") %>% set_dim(base_dimension)
 ```
 
 #### Gender
@@ -97,7 +101,7 @@ As expected, women are make up a bit over half of our respondents.
 ```{r}
 
 
-get_bar_chart_labels(data = survey, variable = s_gender, title = "Gender of the respondents")
+get_bar_chart_labels(data = survey, variable = s_gender, title = "Gender of the respondents")%>% set_dim(base_dimension)
 
 
 ```
@@ -109,7 +113,7 @@ We can break down our respondents by education.
 ```{r}
 
 
-get_bar_chart_labels(data = survey, variable = d_education, title = "Education of the respondents")
+get_bar_chart_labels(data = survey, variable = d_education, title = "Education of the respondents") %>% set_dim(base_dimension)
 
 ```
 
@@ -136,7 +140,7 @@ survey <- survey %>%
 And we get a clearer picture of the distribution of education levels among our respondents. Almost 1 in 4 of our respondents have "Less than college" , more than half have "At least some college", and 1 in 5 have "More than college".
 
 ```{r}
-get_bar_chart_labels(data = survey, variable = d_education_collapse, title = "Education of the respondents")
+get_bar_chart_labels(data = survey, variable = d_education_collapse, title = "Education of the respondents") %>% set_dim(base_dimension)
 
 ```
 
@@ -146,7 +150,7 @@ Whites make around 60% of our sample, Hipanic and Latino represent around 1 in 6
 
 ```{r}
 
-get_bar_chart_labels(data = survey, variable = s_race, title = "Race of the respondents")
+get_bar_chart_labels(data = survey, variable = s_race, title = "Race of the respondents") %>% set_dim(base_dimension)
 
 
 ```
@@ -157,7 +161,7 @@ Around one in 4 of respondents earn "Less than 25,000", one in 4 earn between "\
 
 ```{r}
 
-get_bar_chart_labels(data = survey, variable = s_hhincome, title = "Income of the respondents")
+get_bar_chart_labels(data = survey, variable = s_hhincome, title = "Income of the respondents") %>% set_dim(base_dimension)
 
 
 ```
@@ -271,19 +275,31 @@ grid.arrange(plots,
 
 #### Effect of demographic variables
 
-We will look at the effect of the main demographic variables on the likelihood to say they would download the app.
+We will look at the effect of the main demographic variables on the likelihood to say they would download the app. For this, we will be using `get_index()`, which is a function that allows us to compare the grouped distribution of a certain level of a categorical variable against the total population.
+
+If, for example 50% of all rural respondents say they are "Very likely" to download the app, but only 40% of the total population say the same, then our index would be 50/40\*100 = 125. This would mean that, proportionally to the general population, rural respondents are more likely to download the app. We can see the below example.
 
 ```{r}
 
 DT::datatable(get_index(data = experiment_aug, grouping_var = d_urban, index_var = answer))
 ```
 
-We will better visualize this in a bar graph. We can see that rural and suburban residents tend to have the same distribution among the Answer variable. However, urban residents exhibit a distribution that is eschewed in exactly the opposite direction. Rural and suburban residents are more more unlikely than the general population to say they would download the app, whereas urban resident are more likely to say they would do it.
+We will better visualize the results by using graphs. We will first set the size of all of our graphs.
+
+```{r}
+
+base_dimension_2 <- patchwork::get_dim(get_index(data = experiment_aug, grouping_var = s_race, index_var = answer) %>%
+  get_bar_chart_index(grouping_var = s_race, title = "Plot"))
+
+```
+
+We can see that rural and suburban residents tend to have the same distribution among the Answer variable. However, urban residents exhibit a distribution that is eschewed in exactly the opposite direction. Rural and suburban residents are more more unlikely than the general population to say they would download the app, whereas urban resident are more likely to say they would do it.
 
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = d_urban, index_var = answer) %>%
-  get_bar_chart_index(grouping_var = d_urban, title = "Answer index by place of residence")
+  get_bar_chart_index(grouping_var = d_urban, title = "Answer index by place of residence") %>%
+  set_dim(base_dimension_2)
 
 ```
 
@@ -292,7 +308,8 @@ We turn now on the distribution of answers by gender. We can observe clear diffe
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = s_gender, index_var = answer) %>%
-  get_bar_chart_index(grouping_var = s_gender, title = "Answer index by gender")
+  get_bar_chart_index(grouping_var = s_gender, title = "Answer index by gender") %>%
+  set_dim(base_dimension_2)
 ```
 
 Then we obtain the distribution of answers by education. Respondents with "More than college" tend to be more much likely than the general population to say they would download the app.
@@ -300,7 +317,8 @@ Then we obtain the distribution of answers by education. Respondents with "More 
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = d_education_collapse, index_var = answer) %>%
-  get_bar_chart_index(grouping_var = d_education_collapse, title = "Answer index by education")
+  get_bar_chart_index(grouping_var = d_education_collapse, title = "Answer index by education")%>%
+  set_dim(base_dimension_2)
 
 ```
 
@@ -309,7 +327,8 @@ By looking at the grouped distribution by income levels, we can say that those w
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = s_hhincome, index_var = answer) %>%
-  get_bar_chart_index(grouping_var = s_hhincome, title = "Answer index by education")
+  get_bar_chart_index(grouping_var = s_hhincome, title = "Answer index by education") %>%
+  set_dim(base_dimension_2)
 ```
 
 We turn to the distribution of answers by race. We can observe that African Americans are much more likely than the general population to say they would be "Very likely" to download the app, while white people are more likely than the general population to say they would be "Very unlikely" to download the app.
@@ -317,7 +336,8 @@ We turn to the distribution of answers by race. We can observe that African Amer
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = s_race, index_var = answer) %>%
-  get_bar_chart_index(grouping_var = s_race, title = "Answer index by race")
+  get_bar_chart_index(grouping_var = s_race, title = "Answer index by race") %>%
+  set_dim(base_dimension_2)
 ```
 
 We will now turn to our attention to see if the distribution of answers differs between levels of the question *How often would you say you have trouble sleeping at night during a typical week?.* Unsurprisingly, those who say they have trouble sleeping every night are much more likely than the general population to say they would likely download the app.
@@ -326,7 +346,8 @@ We will now turn to our attention to see if the distribution of answers differs 
 
 
 get_index(data = experiment_aug, grouping_var = s_problem, index_var = answer) %>%
-  get_bar_chart_index(grouping_var = s_problem, title = "Answer index by frequency of trouble slepping")
+  get_bar_chart_index(grouping_var = s_problem, title = "Answer index by frequency of trouble slepping") %>%
+  set_dim(base_dimension_2)
 
 ```
 
@@ -341,7 +362,8 @@ There seems to be no notable differences on the distribution of the likelihood t
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = duration, index_var = answer) %>%
-  get_bar_chart_index(grouping_var = duration, title = "Answer index by duration")
+  get_bar_chart_index(grouping_var = duration, title = "Answer index by duration") %>%
+  set_dim(base_dimension_2)
 
 ```
 
@@ -352,7 +374,8 @@ There are no significant differences in distribution of the likelihood of downlo
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = offer, index_var = answer) %>%
-  get_bar_chart_index(grouping_var = offer, title = "Answer index by offer")
+  get_bar_chart_index(grouping_var = offer, title = "Answer index by offer") %>%
+  set_dim(base_dimension_2)
 
 ```
 
@@ -363,7 +386,8 @@ The phase"breaking bad habits and creating new routines" seems to be the best pe
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = outcome, index_var = answer) %>%
-  get_bar_chart_index(grouping_var = outcome, title = "Answer index by offer")
+  get_bar_chart_index(grouping_var = outcome, title = "Answer index by offer") %>%
+  set_dim(base_dimension_2)
 
 ```
 
@@ -372,7 +396,8 @@ get_index(data = experiment_aug, grouping_var = outcome, index_var = answer) %>%
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = price, index_var = answer) %>%
-  get_bar_chart_index(grouping_var = price, title = "Answer index by offer")
+  get_bar_chart_index(grouping_var = price, title = "Answer index by offer") %>%
+  set_dim(base_dimension_2)
 
 ```
 
@@ -383,7 +408,8 @@ We observe a clear difference in the distribution of the answer variable accordi
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = rtb, index_var = answer) %>%
-  get_bar_chart_index(grouping_var = rtb, title = "Answer index by offer")
+  get_bar_chart_index(grouping_var = rtb, title = "Answer index by offer") %>%
+  set_dim(base_dimension_2)
 
 ```
 
@@ -394,7 +420,8 @@ The best performing phrase appears to be "scientific evidence".
 ```{r}
 
 get_index(data = experiment_aug, grouping_var = social_proof, index_var = answer) %>%
-  get_bar_chart_index(grouping_var = social_proof, title = "Answer index by offer")
+  get_bar_chart_index(grouping_var = social_proof, title = "Answer index by offer") %>%
+  set_dim(base_dimension_2)
 
 ```
 
@@ -595,6 +622,8 @@ From the coefficients and p-values of the regression, we can make the following 
 
 -   A stronger interest in working with a professional coach is associated with a higher likelihood to download the app.
 
+## Conclusions
+
 Based on the above, we can say that:
 
 -   Out of the six variables of the experiment, only for one variable we have strong statistical evidence of an association with the likelihood to download the app: `price`. The higher the price,
@@ -602,3 +631,9 @@ Based on the above, we can say that:
 -   The variables `duration` and `offer` show no statistical significant effect on the likelihood to download based on both the ordinal logistic regression and the chi-square test.
 
 -   Even though the statistical evidence is not very strong, we might say that for the `social_proof` variable, the answers that signal science-backed results ("leading researches" and "scientific evidence" ) seem to perform better.
+
+I would the client wants to boost the number of users that download the app, I would then recommend to:
+
+-   set the price at \$20/month
+
+-   choose as social proof a phrase that will make users think that the app is based on scientific evidence (like "leading researches" or "scientific evidence" )

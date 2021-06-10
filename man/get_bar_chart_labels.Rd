@@ -2,12 +2,12 @@
 % Please edit documentation in R/functions.R
 \name{get_bar_chart_labels}
 \alias{get_bar_chart_labels}
-\title{Bar plot graph function}
+\title{Bar chart function}
 \usage{
 get_bar_chart_labels(data, variable, title = "Plot_title")
 }
 \arguments{
-\item{data}{A haven labelled dataset}
+\item{data}{A labelled dataset}
 
 \item{variable}{The variable you want to plot}
 
@@ -17,5 +17,5 @@ get_bar_chart_labels(data, variable, title = "Plot_title")
 A ggplot bar plot graph
 }
 \description{
-This function allows you to produce a ggplot graph plot
+This function produces a ggplot bar chart with the appropriate labels that shows the percentage for each level.
 }

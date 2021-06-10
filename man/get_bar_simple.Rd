@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{get_bar_simple}
 \alias{get_bar_simple}
-\title{Plot graph function}
+\title{Simple bar chart function}
 \usage{
 get_bar_simple(data, variable)
 }
@@ -15,5 +15,5 @@ get_bar_simple(data, variable)
 A ggplot bar plot graph
 }
 \description{
-This function allows you to produce a ggplot graph plot
+This function allows you to produce a ggplot bar char plot without axis levels. Useful for plotting several variables in a single grid.
 }

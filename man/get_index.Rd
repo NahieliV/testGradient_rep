@@ -17,5 +17,5 @@ get_index(data = survey, grouping_var, index_var)
 A dataframe with the indexes
 }
 \description{
-This function allows you to calculate the levels of a variable in contrast to group provided by levels of another variable
+This function calculates the levels of a variable in contrast to groups provided by levels of another variable
 }

@@ -1,6 +1,6 @@
 #' Index function
 #'
-#' This function allows you to calculate the levels of a variable in contrast to group provided by levels of another variable
+#' This function calculates the levels of a variable in contrast to groups provided by levels of another variable
 #'
 #' @param data The dataset for which you will be calculating the indexes
 #' @param grouping_var The variable for whose levels you will calculate the index
@@ -34,11 +34,11 @@ get_index <- function(data = survey, grouping_var, index_var) {
 }
 
 
-#' Bar plot graph function
+#' Bar chart function
 #'
-#' This function allows you to produce a ggplot graph plot
+#' This function produces a ggplot bar chart with the appropriate labels that shows the percentage for each level.
 #'
-#' @param data A haven labelled dataset
+#' @param data A labelled dataset
 #' @param variable The variable you want to plot
 #' @param title  The name of the plot
 #' @return A ggplot bar plot graph
@@ -76,9 +76,9 @@ get_bar_chart_labels <- function(data, variable, title = "Plot_title") {
 }
 
 
-#' Plot graph function
+#' Simple bar chart function
 #'
-#' This function allows you to produce a ggplot graph plot
+#' This function allows you to produce a ggplot bar char plot without axis levels. Useful for plotting several variables in a single grid.
 #'
 #' @param data A dataset
 #' @param variable The variable you want to plot
@@ -95,9 +95,9 @@ get_bar_simple <- function(data, variable) {
 }
 
 
-#' Answer index graph function
+#' Bar chart function for an index
 #'
-#' This function allows you to produce a ggplot graph plot
+#' This function produces a ggplot bar chart with the appropriate labels 
 #'
 #' @param data A dataset with the distribution of answers per level of the grouping variable
 #' @param variable The variable you want to plot
