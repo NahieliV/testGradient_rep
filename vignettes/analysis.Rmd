@@ -1,5 +1,5 @@
 ---
-title: "Analysis of survey experiment"
+title: "Analysis_of_survey_experiment"
 output:
   html_document:
     toc: true
