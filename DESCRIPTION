@@ -19,11 +19,10 @@ Suggests:
     knitr
 VignetteBuilder: knitr
 Imports:
-	data.table (>= 1.9.4),
-	tidyverse
-	labelled
-	DT
-	cowplot
-	grid
-	gridExtra
-	scales
+	tidyverse,
+	labelled,
+	DT,
+	cowplot,
+	grid,
+	gridExtra,
+	scales,
