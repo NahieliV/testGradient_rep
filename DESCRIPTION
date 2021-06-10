@@ -3,7 +3,10 @@ Title: Analysis of a survey experiment
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Nahieli",
-           family = "Vasquez")
+           family = "Vasquez",
+           role = c("aut", "cre"),
+           email = "eli.fereg@gmail.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: This package contains some functions and an analysis of an experiment on the effect of some variables on the likelihood of downloading an app.
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
