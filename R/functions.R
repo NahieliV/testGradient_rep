@@ -13,7 +13,7 @@ get_index <- function(data = survey, grouping_var, index_var) {
 
   index_df <- data %>%
     unlabelled () %>%
-    mutate(across(where(is.factor), ~str_replace(., '\\s+\\(([^()]+)\\)', ''))) %>%
+    mutate(across(where(is.factor), ~stringr::str_replace(., '\\s+\\(([^()]+)\\)', ''))) %>%
     group_by({{ grouping_var }}, {{ index_var }})%>%
     count(wt = weights) %>%
     ungroup() %>%

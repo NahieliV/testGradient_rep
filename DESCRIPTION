@@ -21,11 +21,16 @@ Suggests:
     knitr
 VignetteBuilder: knitr
 Imports:
-	tidyverse,
 	labelled,
 	DT,
   	cowplot,
 	grid,
 	gridExtra,
 	scales,
-	patchwork	
+	patchwork,
+	dplyr, 
+	ggplot2,
+	stringr,
+	purrr, 
+	tibble,
+	tidyr
