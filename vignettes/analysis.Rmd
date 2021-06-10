@@ -47,7 +47,7 @@ Then we install our own library
 
 ```{r}
 
-library(miLibreria2)
+library(testGradient)
 ```
 
 ## Exploratory data analysis
