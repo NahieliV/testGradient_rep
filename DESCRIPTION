@@ -33,4 +33,5 @@ Imports:
 	stringr,
 	purrr, 
 	tibble,
-	tidyr
+	tidyr,
+	MASS
